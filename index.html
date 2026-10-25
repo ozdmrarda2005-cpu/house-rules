@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>House Rules Welcome</title>
+<style>
+  :root{
+    --bg:#f4f1ea; --card:#ffffff; --ink:#1f2a2e; --muted:#5d6a6f;
+    --brand:#2f6f6a; --brand-ink:#ffffff; --line:#d9d4c7; --ok:#2e7d4f; --accent:#e9c46a;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --bg:#14191b; --card:#1e2528; --ink:#eef1ee; --muted:#9aa7ab; --brand:#5fb3ab; --brand-ink:#0d1a19; --line:#2c373b; --ok:#6ccf93; --accent:#e9c46a; }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+  .app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;padding:20px 16px 28px}
+  header.bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  .logo{font-weight:700;letter-spacing:.2px}
+  .step{font-size:13px;color:var(--muted)}
+  h1{font-size:28px;line-height:1.2;margin:8px 0 10px}
+  h2{font-size:22px;margin:4px 0 6px}
+  p.lead{color:var(--muted);margin:0 0 18px}
+  .hero{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 18px;margin-bottom:18px}
+  .house{display:flex;gap:12px;align-items:center;margin-bottom:14px}
+  .house .badge{width:46px;height:46px;border-radius:12px;background:var(--accent);display:grid;place-items:center;font-size:24px}
+  .house b{display:block}
+  .house span{font-size:14px;color:var(--muted)}
+  button{font:inherit;cursor:pointer}
+  .btn{display:block;width:100%;padding:14px 16px;border:0;border-radius:14px;background:var(--brand);color:var(--brand-ink);font-weight:650;font-size:17px}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);margin-top:10px}
+  .btn:focus-visible,.check:focus-within{outline:3px solid var(--accent);outline-offset:2px}
+  .progress{margin:6px 0 16px}
+  .progress .label{display:flex;justify-content:space-between;font-size:14px;color:var(--muted);margin-bottom:6px}
+  .track{height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+  .fill{height:100%;width:0;background:var(--ok);transition:width .25s}
+  .rule{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 14px 12px;margin-bottom:12px}
+  .rule.read{border-color:var(--ok)}
+  .rule h3{margin:0 0 4px;font-size:18px;display:flex;gap:8px;align-items:center}
+  .rule .why{margin:0 0 10px;color:var(--muted);font-size:15px}
+  .rule .why b{color:var(--ink)}
+  .check{display:flex;gap:10px;align-items:center;font-size:15px;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,var(--line) 35%,transparent)}
+  .check input{width:22px;height:22px;accent-color:var(--ok)}
+  .tip{font-size:14px;color:var(--muted);margin-top:6px}
+  .done{text-align:center;padding:30px 16px}
+  .done .big{font-size:64px}
+  .summary{text-align:left;margin:18px 0}
+  .summary li{margin:6px 0}
+  [hidden]{display:none!important}
+  .sr{position:absolute;left:-9999px}
+</style>
+</head>
+<body>
+<main class="app" id="app">
+  <header class="bar">
+    <span class="logo">🏠 House Rules</span>
+    <span class="step" id="stepLabel" aria-live="polite">Step 1 of 3</span>
+  </header>
+
+  <!-- Screen 1: Welcome -->
+  <section id="screen1" aria-labelledby="t1">
+    <div class="hero">
+      <div class="house"><div class="badge" aria-hidden="true">🌻</div><div><b>Sunny Flat</b><span>4 housemates · Potsdam</span></div></div>
+      <h1 id="t1">Welcome to Sunny Flat</h1>
+      <p class="lead">Before you settle in, take two minutes to read the house rules. Each rule comes with the reason behind it, so nothing is a surprise.</p>
+      <button class="btn" id="start">See the rules</button>
+    </div>
+    <p class="tip">Rules are set by the housemates together. If something does not fit your routine, talk to them early.</p>
+  </section>
+
+  <!-- Screen 2: Rules + checklist -->
+  <section id="screen2" hidden aria-labelledby="t2">
+    <h2 id="t2">House rules</h2>
+    <p class="lead">Tick each rule once you have read it and understood the reason.</p>
+    <div class="progress" aria-label="Progress">
+      <div class="label"><span id="progText">0 of 5 rules read</span><span id="progPct">0%</span></div>
+      <div class="track"><div class="fill" id="fill"></div></div>
+    </div>
+    <div id="rules"></div>
+    <button class="btn" id="finish" disabled>Finish checklist</button>
+    <button class="btn ghost" id="back1">Back</button>
+  </section>
+
+  <!-- Screen 3: Done -->
+  <section id="screen3" hidden aria-labelledby="t3">
+    <div class="hero done">
+      <div class="big" aria-hidden="true">🎉</div>
+      <h1 id="t3">You're all set, welcome home</h1>
+      <p class="lead">You have read all 5 rules. If anything is unclear later, ask a housemate before it turns into an argument.</p>
+      <ul class="summary" id="summary"></ul>
+      <button class="btn" id="again">Review the rules again</button>
+    </div>
+  </section>
+</main>
+
+<script>
+const RULES = [
+  {icon:"🔇", title:"Quiet hours: 22:00 to 07:00", why:"Some housemates have early classes or work shifts and need their sleep."},
+  {icon:"🍽️", title:"Wash your dishes the same day", why:"The kitchen is shared. Dishes left overnight block everyone else from cooking."},
+  {icon:"🧹", title:"Cleaning day is Saturday", why:"One fixed day means everyone knows their turn and nobody feels they do it alone."},
+  {icon:"🚫", title:"No vacuuming on Sunday", why:"Sunday is the one day several housemates can rest. If you can only clean on Sunday, ask first."},
+  {icon:"🙋", title:"Ask before inviting overnight guests", why:"The flat is shared. A quick message avoids surprises and keeps everyone comfortable."}
+];
+const state = new Set();
+const $ = id => document.getElementById(id);
+const screens = ["screen1","screen2","screen3"];
+
+function show(n){
+  screens.forEach((id,i)=> $(id).hidden = (i!==n-1));
+  $("stepLabel").textContent = "Step " + n + " of 3";
+  window.scrollTo({top:0});
+}
+
+function render(){
+  const wrap = $("rules");
+  wrap.innerHTML = "";
+  RULES.forEach((r,i)=>{
+    const card = document.createElement("article");
+    card.className = "rule" + (state.has(i) ? " read" : "");
+    card.innerHTML =
+      '<h3><span aria-hidden="true">'+r.icon+'</span>'+r.title+'</h3>'+
+      '<p class="why"><b>Why:</b> '+r.why+'</p>'+
+      '<label class="check"><input type="checkbox" '+(state.has(i)?"checked":"")+' data-i="'+i+'"> I have read this rule</label>';
+    wrap.appendChild(card);
+  });
+  updateProgress();
+}
+
+function updateProgress(){
+  const n = state.size, total = RULES.length, pct = Math.round(n/total*100);
+  $("progText").textContent = n + " of " + total + " rules read";
+  $("progPct").textContent = pct + "%";
+  $("fill").style.width = pct + "%";
+  $("finish").disabled = n < total;
+}
+
+$("rules").addEventListener("change", e=>{
+  const i = e.target.dataset.i;
+  if(i===undefined) return;
+  e.target.checked ? state.add(+i) : state.delete(+i);
+  e.target.closest(".rule").classList.toggle("read", e.target.checked);
+  updateProgress();
+});
+$("start").onclick = ()=>{ render(); show(2); };
+$("back1").onclick = ()=> show(1);
+$("finish").onclick = ()=>{
+  $("summary").innerHTML = RULES.map(r=>"<li>"+r.icon+" "+r.title+"</li>").join("");
+  show(3);
+};
+$("again").onclick = ()=>{ state.clear(); render(); show(2); };
+render();
+</script>
+</body>
+</html>
